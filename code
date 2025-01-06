@@ -1,0 +1,40 @@
+import org.jsoup.Jsoup;
+import org.jsoup.nodes.Document;
+import org.jsoup.nodes.Element;
+import org.jsoup.select.Elements;
+
+import java.io.IOException;
+
+public class WebScrapingExample {
+    public static void main(String[] args) {
+        // URL de la page à scraper
+        String url = "https://example.com";  // Remplace par l'URL que tu veux scrapper
+
+        try {
+            // Connexion à l'URL et récupération du document HTML
+            Document doc = Jsoup.connect(url).get();
+
+            // Exemple 1 : Récupérer tous les titres <h1>
+            Elements headers = doc.select("h1");
+            for (Element header : headers) {
+                System.out.println("Titre: " + header.text());
+            }
+
+            // Exemple 2 : Récupérer tous les paragraphes <p>
+            Elements paragraphs = doc.select("p");
+            for (Element paragraph : paragraphs) {
+                System.out.println("Paragraphe: " + paragraph.text());
+            }
+
+            // Exemple 3 : Récupérer toutes les images <img> et leurs attributs src
+            Elements images = doc.select("img");
+            for (Element image : images) {
+                System.out.println("Image source: " + image.attr("src"));
+            }
+
+        } catch (IOException e) {
+            // Gestion des erreurs en cas de problème avec la connexion ou le parsing
+            e.printStackTrace();
+        }
+    }
+}
