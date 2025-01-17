@@ -35,7 +35,7 @@ Ces informations seront ensuite utilisées pour des visualisations interactives 
 ### **2. Bibliothèques Java nécessaires**  
 Les bibliothèques requises pour ce projet sont :  
 - **Jsoup** : pour effectuer le scraping des pages web.  
-- **OpenCSV** : pour écrire les données dans un fichier CSV.  
+- **java.io** : bibliothèque native Java pour lire et écrire des fichiers CSV.  
 
 Ajoutez-les à votre projet avec Maven ou Gradle :  
 
