@@ -1,40 +1,153 @@
 import org.jsoup.Jsoup;
+
 import org.jsoup.nodes.Document;
+
 import org.jsoup.nodes.Element;
+
 import org.jsoup.select.Elements;
+
+
+
+import java.io.FileWriter;
 
 import java.io.IOException;
 
-public class WebScrapingExample {
+
+
+public class ExtractTableData {
+
+
+
     public static void main(String[] args) {
-        // URL de la page à scraper
-        String url = "https://example.com";  // Remplace par l'URL que tu veux scrapper
 
-        try {
-            // Connexion à l'URL et récupération du document HTML
-            Document doc = Jsoup.connect(url).get();
+        String outputFileName = "formula1_driver_standings.csv";
 
-            // Exemple 1 : Récupérer tous les titres <h1>
-            Elements headers = doc.select("h1");
-            for (Element header : headers) {
-                System.out.println("Titre: " + header.text());
+
+
+        try (FileWriter writer = new FileWriter(outputFileName)) {
+
+            // Écrire l'en-tête du fichier CSV
+
+            writer.append("Year,Position,Driver,Nationality,Car,Points\n");
+
+
+
+            // Boucle à partir de l'année 1950 jusqu'à 2024
+
+            for (int year = 1950; year <= 2024; year++) {
+
+                try {
+
+                    // URL de la page contenant le tableau des pilotes, année dynamique
+
+                    String url = "https://www.formula1.com/en/results/" + year + "/drivers";
+
+
+
+                    // Charger le contenu de la page
+
+                    Document document = Jsoup.connect(url).get();
+
+
+
+                    // Sélectionner le conteneur principal
+
+                    Element container = document.selectFirst(".f1-inner-wrapper.flex.flex-col.gap-normal");
+
+
+
+                    if (container != null) {
+
+                        // Rechercher le tableau à l'intérieur du conteneur
+
+                        Element table = container.selectFirst("table");
+
+
+
+                        if (table != null) {
+
+                            // Récupérer toutes les lignes du tableau (balises <tr>)
+
+                            Elements rows = table.select("tr");
+
+
+
+                            // Parcourir toutes les lignes à partir de la deuxième (ignorer l'en-tête)
+
+                            for (int i = 1; i < rows.size(); i++) {
+
+                                Element row = rows.get(i);
+
+
+
+                                // Récupérer toutes les colonnes (balises <td>)
+
+                                Elements columns = row.select("td");
+
+
+
+                                // Vérifier que les colonnes ne sont pas vides
+
+                                if (!columns.isEmpty()) {
+
+                                    // Extraire les données de chaque colonne
+
+                                    String position = columns.get(0).text(); // Position
+
+                                    String driver = columns.get(1).text();   // Pilote
+
+                                    String nationality = columns.get(2).text(); // Nationalité
+
+                                    String car = columns.get(3).text();      // Écurie
+
+                                    String points = columns.get(4).text();   // Points
+
+
+
+                                    // Écrire les informations dans le fichier CSV
+
+                                    writer.append(String.format("%d,%s,%s,%s,%s,%s\n",
+
+                                            year, position, driver, nationality, car, points));
+
+                                }
+
+                            }
+
+                        } else {
+
+                            System.out.println("Le tableau n'a pas été trouvé à l'intérieur du conteneur pour l'année " + year);
+
+                        }
+
+                    } else {
+
+                        System.out.println("Le conteneur principal n'a pas été trouvé sur cette page pour l'année " + year);
+
+                    }
+
+                } catch (IOException e) {
+
+                    System.err.println("Erreur lors de la connexion à l'URL pour l'année " + year + " : " + e.getMessage());
+
+                } catch (Exception e) {
+
+                    System.err.println("Erreur inattendue pour l'année " + year + " : " + e.getMessage());
+
+                }
+
             }
 
-            // Exemple 2 : Récupérer tous les paragraphes <p>
-            Elements paragraphs = doc.select("p");
-            for (Element paragraph : paragraphs) {
-                System.out.println("Paragraphe: " + paragraph.text());
-            }
 
-            // Exemple 3 : Récupérer toutes les images <img> et leurs attributs src
-            Elements images = doc.select("img");
-            for (Element image : images) {
-                System.out.println("Image source: " + image.attr("src"));
-            }
+
+            System.out.println("Données exportées dans le fichier : " + outputFileName);
 
         } catch (IOException e) {
-            // Gestion des erreurs en cas de problème avec la connexion ou le parsing
-            e.printStackTrace();
+
+            System.err.println("Erreur lors de l'écriture dans le fichier CSV : " + e.getMessage());
+
         }
+
     }
+
 }
